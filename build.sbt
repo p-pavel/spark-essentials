@@ -2,9 +2,14 @@ name := "spark-essentials"
 
 version := "0.1"
 
-scalaVersion := "2.12.10"
+scalaVersion := "3.2.2"
+javaOptions ++= Seq("--add-exports","java.base/sun.nio.ch=ALL-UNNAMED")
+fork := true
 
-val sparkVersion = "3.0.2"
+Compile / run := Defaults.runTask(Compile / fullClasspath, Compile / run / mainClass, Compile / run / runner).evaluated
+
+
+val sparkVersion = "3.3.1"
 val vegasVersion = "0.3.11"
 val postgresVersion = "42.2.2"
 
@@ -15,9 +20,11 @@ resolvers ++= Seq(
 )
 
 
-libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % sparkVersion,
-  "org.apache.spark" %% "spark-sql" % sparkVersion,
+libraryDependencies ++= 
+  Seq("spark-core", "spark-sql")
+    .map(pkg => ("org.apache.spark" %% pkg % sparkVersion % "provided").cross(CrossVersion.for3Use2_13))
+libraryDependencies ++=
+  Seq(
   // logging
   "org.apache.logging.log4j" % "log4j-api" % "2.4.1",
   "org.apache.logging.log4j" % "log4j-core" % "2.4.1",
